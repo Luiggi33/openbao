@@ -82,7 +82,7 @@ Configuration:
 
   password=<string>
       LDAP password to use for authentication. If not provided, it will use
-			the VAULT_LDAP_PASSWORD environment variable. If this is not set, the
+			the BAO_LDAP_PASSWORD environment variable. If this is not set, the
 			CLI will prompt for this on stdin.
 
   username=<string>
