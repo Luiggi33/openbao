@@ -8,7 +8,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { setupEngine } from 'ember-engines/test-support';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { render } from '@ember/test-helpers';
-import { typeInSearch, clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { typeInSearch, clickTrigger } from 'ember-power-select/test-support/helpers';
+import { selectChoose } from 'ember-power-select/test-support';
 import { SELECTORS } from 'vault/tests/helpers/kubernetes/overview';
 import hbs from 'htmlbars-inline-precompile';
 

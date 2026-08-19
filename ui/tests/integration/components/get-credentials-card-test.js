@@ -7,7 +7,8 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import Service from '@ember/service';
 import { click, find, render, typeIn } from '@ember/test-helpers';
-import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
+import { clickTrigger } from 'ember-power-select/test-support/helpers';
+import { selectChoose } from 'ember-power-select/test-support';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 

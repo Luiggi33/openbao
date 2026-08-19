@@ -11,7 +11,8 @@ import ENV from 'vault/config/environment';
 import authPage from 'vault/tests/pages/auth';
 import logout from 'vault/tests/pages/logout';
 import { create } from 'ember-cli-page-object';
-import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
+import { clickTrigger } from 'ember-power-select/test-support/helpers';
+import { selectChoose } from 'ember-power-select/test-support';
 import ss from 'vault/tests/pages/components/search-select';
 import fm from 'vault/tests/pages/components/flash-message';
 import {
