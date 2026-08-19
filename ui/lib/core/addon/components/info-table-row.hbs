@@ -88,7 +88,6 @@
                 <CopyButton
                   @text={{@tooltipText}}
                   @onSuccess={{action (set-flash-message "Data copied!")}}
-                  @tagName="div"
                   disabled={{not @isTooltipCopyable}}
                   class={{if @isTooltipCopyable "has-pointer"}}
                   data-test-tooltip-copy

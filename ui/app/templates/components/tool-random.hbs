@@ -15,7 +15,7 @@
     <div class="control">
       <CopyButton
         @text={{@random_bytes}}
-        @class="button is-primary"
+        class="button is-primary"
         @buttonType="button"
         @onSuccess={{action (set-flash-message "Random bytes copied!")}}
       >

@@ -68,7 +68,7 @@
     <div class="control">
       <CopyButton
         @text={{stringify @unwrap_data}}
-        @class="button is-primary"
+        class="button is-primary"
         @buttonType="button"
         @onSuccess={{action (set-flash-message "Data copied!")}}
       >
