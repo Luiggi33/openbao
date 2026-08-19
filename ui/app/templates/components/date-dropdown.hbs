@@ -4,6 +4,7 @@
       data-test-popup-menu-trigger="month"
       class={{concat "toolbar-link" (if D.isOpen " is-active")}}
       @htmlTag="button"
+      type="button"
     >
       {{or this.selectedMonth.name "Month"}}
       <Chevron @direction="down" @isButton={{true}} />
@@ -31,6 +32,7 @@
       data-test-popup-menu-trigger="year"
       class={{concat "toolbar-link" (if D.isOpen " is-active")}}
       @htmlTag="button"
+      type="button"
     >
       {{or this.selectedYear "Year"}}
       <Chevron @direction="down" @isButton={{true}} />
