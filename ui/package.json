@@ -48,7 +48,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.27.0",
     "@babel/plugin-proposal-decorators": "^7.25.9",
-    "@ember-data/legacy-compat": "4.12.8",
+    "@ember-data/legacy-compat": "5.3.13",
     "@ember/app-tsconfig": "^2.0.0",
     "@ember/legacy-built-in-components": "^0.4.1",
     "@ember/optional-features": "^2.2.0",
