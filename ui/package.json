@@ -191,7 +191,7 @@
     "xstate": "^3.3.3"
   },
   "engines": {
-    "node": "16.* || >= 18"
+    "node": "16.* || >= 20"
   },
   "ember": {
     "edition": "octane"
