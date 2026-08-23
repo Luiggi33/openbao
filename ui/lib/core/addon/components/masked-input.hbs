@@ -26,7 +26,7 @@
   {{/if}}
   {{#if @allowCopy}}
     <CopyButton
-      @text={{@value}}
+      @text={{this.copyValue}}
       @onSuccess={{action (set-flash-message "Data copied!")}}
       class="copy-button button {{if @displayOnly 'is-compact'}}"
       title={{"copy value"}}

@@ -49,6 +49,11 @@ export default class MaskedInputComponent extends Component {
     autosize(document.getElementById(this.textareaId));
   }
 
+  get copyValue() {
+    const { value } = this.args;
+    return Array.isArray(value) ? value.join('\n') : value;
+  }
+
   @action onChange(evt) {
     const value = evt.target.value;
     if (this.args.onChange) {
