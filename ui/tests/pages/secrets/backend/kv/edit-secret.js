@@ -9,8 +9,8 @@ import { isPresent, clickable, visitable, create, fillable } from 'ember-cli-pag
 export default create({
   ...Base,
   path: fillable('[data-test-secret-path="true"]'),
-  secretKey: fillable('[data-test-secret-key]'),
-  secretValue: fillable('[data-test-secret-value] textarea'),
+  secretKey: fillable('[data-test-secret-key]', { at: 0 }),
+  secretValue: fillable('[data-test-secret-value] textarea', { at: 0 }),
   save: clickable('[data-test-secret-save]'),
   deleteBtn: clickable('[data-test-secret-delete] button'),
   confirmBtn: clickable('[data-test-confirm-button]'),
