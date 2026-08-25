@@ -48,13 +48,12 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.27.0",
     "@babel/plugin-proposal-decorators": "^7.25.9",
-    "@ember-data/legacy-compat": "5.3.13",
     "@ember/app-tsconfig": "^2.0.0",
     "@ember/legacy-built-in-components": "^0.4.1",
     "@ember/optional-features": "^2.2.0",
     "@ember/render-modifiers": "^3.0.0",
     "@ember/string": "^3.1.1",
-    "@ember/test-helpers": "3.0.3",
+    "@ember/test-helpers": "3.2.1",
     "@ember/test-waiters": "^3.0.0",
     "@eslint/js": "^9.24.0",
     "@glimmer/component": "^1.1.2",
@@ -77,7 +76,6 @@
     "@types/ember__engine": "^4.0.4",
     "@types/ember__error": "^4.0.1",
     "@types/ember__object": "^4.0.5",
-    "@types/ember__polyfills": "^4.0.1",
     "@types/ember__routing": "^4.0.12",
     "@types/ember__runloop": "^4.0.2",
     "@types/ember__service": "^4.0.1",
@@ -191,7 +189,7 @@
     "xstate": "^3.3.3"
   },
   "engines": {
-    "node": "16.* || >= 20"
+    "node": "16.* || 18.* || >= 20.0.0"
   },
   "ember": {
     "edition": "octane"
