@@ -20,9 +20,7 @@ permissions:
   contents: read
 
 env:
-  # Pinned deliberately: only this version of the module carries CMVP
-  # certificate #5247. Bumping it is a compliance decision, not a chore.
-  GOFIPS140: v1.0.0
+  GOFIPS140: v1.26.0
   BAO_ADDR: http://127.0.0.1:8200
 
 jobs:

@@ -9,7 +9,7 @@ export GOARM=${GOARM:-$(go env GOARM)}
 export GOARCH=${GOARCH:-$(go env GOARCH)}
 export CGO_ENABLED=${CGO_ENABLED:-$(go env CGO_ENABLED)}
 
-export GOFIPS140=${GOFIPS140:-v1.0.0}
+export GOFIPS140=${GOFIPS140:-v1.26.0}
 
 case "$GOOS" in
     windows)

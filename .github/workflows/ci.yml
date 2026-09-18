@@ -86,7 +86,7 @@ jobs:
       name: "fips-on"
       # What a release binary does once an operator sets GODEBUG=fips140=on:
       # approved algorithms go through the module, unapproved ones still work.
-      env-vars: '{"GOFIPS140":"v1.0.0","GODEBUG":"fips140=on"}'
+      env-vars: '{"GOFIPS140":"v1.26.0","GODEBUG":"fips140=on"}'
       checkout-ref: ${{ needs.setup.outputs.checkout-ref }}
     secrets: inherit
 
@@ -106,7 +106,7 @@ jobs:
       name: "fips-only"
       # The compliance target: unapproved primitives panic or error instead of
       # silently passing through. Expected to be widely red today.
-      env-vars: '{"GOFIPS140":"v1.0.0","GODEBUG":"fips140=only"}'
+      env-vars: '{"GOFIPS140":"v1.26.0","GODEBUG":"fips140=only"}'
       checkout-ref: ${{ needs.setup.outputs.checkout-ref }}
     secrets: inherit
 
