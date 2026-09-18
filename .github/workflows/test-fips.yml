@@ -1,0 +1,120 @@
+# Compiles every package and every test binary in every module against the
+# FIPS 140-3 validated Go Cryptographic Module, then checks that a server built
+# that way still boots with FIPS mode enabled.
+#
+# This is the compile half of the baseline. The run half is the two test-go
+# matrices in ci.yml (fips140=on and fips140=only).
+#
+# See https://go.dev/doc/security/fips140.
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        description: The ref to use for checkout.
+        required: false
+        default: ${{ github.ref }}
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  # Pinned deliberately: only this version of the module carries CMVP
+  # certificate #5247. Bumping it is a compliance decision, not a chore.
+  GOFIPS140: v1.0.0
+  BAO_ADDR: http://127.0.0.1:8200
+
+jobs:
+  build-fips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          persist-credentials: false
+      - uses: ./.github/actions/set-up-go
+
+      # Every module is attempted even after one fails, so a single broken
+      # module does not hide the state of the rest. tools/ is excluded: it is a
+      # build-tool module, not shipped code.
+      - name: Compile every package and test binary
+        run: |
+          set -uo pipefail
+          failed=0
+
+          modules="$(find . -name go.mod -not -path './ui/*' -not -path './tools/*' \
+            -printf '%h\n' | sort)"
+
+          {
+            echo "## FIPS 140-3 compile baseline"
+            echo
+            echo "Module | \`go build ./...\` | \`go test -run='^\$' ./...\`"
+            echo "--- | --- | ---"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for dir in $modules; do
+            echo "::group::$dir"
+
+            build=":white_check_mark:"
+            if ! (cd "$dir" && go build ./...); then
+              build=":x:"
+              failed=1
+            fi
+
+            # -run='^$' links every test binary but runs no test, which is the
+            # cheapest way to prove the test files still compile.
+            vet=":white_check_mark:"
+            if ! (cd "$dir" && go test -run='^$' -count=1 ./...); then
+              vet=":x:"
+              failed=1
+            fi
+
+            echo "\`$dir\` | $build | $vet" >> "$GITHUB_STEP_SUMMARY"
+            echo "::endgroup::"
+          done
+
+          exit "$failed"
+
+      - name: Build the bao binary
+        run: go build -o bin/bao .
+
+      - name: Check the module is linked and left off by default
+        run: |
+          set -euo pipefail
+          metadata="$(go version -m bin/bao)"
+          echo "$metadata" | grep -E 'GOFIPS140|DefaultGODEBUG'
+
+          # The recorded version is the resolved alias (e.g. v1.0.0-c2097c7c),
+          # so match on the prefix we pinned above.
+          grep -qF "GOFIPS140=${GOFIPS140}" <<< "$metadata"
+
+          # main.go carries //go:debug fips140=off so that enabling FIPS mode,
+          # and the TLS restrictions that come with it, stays an opt-in.
+          grep -qF 'DefaultGODEBUG=fips140=off' <<< "$metadata"
+
+      - name: Smoke test a server with FIPS mode enabled
+        run: |
+          set -euo pipefail
+          GODEBUG=fips140=on ./bin/bao server -dev -dev-root-token-id=root \
+            -dev-listen-address=127.0.0.1:8200 > server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          # bao status exits non-zero while the server is still sealed or not
+          # yet listening, so polling it covers both.
+          for _ in $(seq 1 30); do
+            if ./bin/bao status > /dev/null 2>&1; then
+              ./bin/bao status
+              exit 0
+            fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          echo "server did not unseal under GODEBUG=fips140=on" >&2
+          cat server.log >&2
+          exit 1

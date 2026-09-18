@@ -230,8 +230,11 @@ jobs:
                 case "race":
                   prefixToSearchFor = 'Run Go tests with data race detection / test-go (${{ matrix.id }})'
                   break
-                case "fips":
-                  prefixToSearchFor = 'Run Go tests with FIPS configuration / test-go (${{ matrix.id }})'
+                case "fips-on":
+                  prefixToSearchFor = 'Run Go tests in FIPS mode / test-go (${{ matrix.id }})'
+                  break
+                case "fips-only":
+                  prefixToSearchFor = 'Run Go tests in FIPS-only mode / test-go (${{ matrix.id }})'
                   break
                 default:
                   prefixToSearchFor = 'Run Go tests / test-go (${{ matrix.id }})'

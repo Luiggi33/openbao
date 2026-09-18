@@ -10,11 +10,15 @@ on:
     paths-ignore:
       - "website/**"
       - "ui/**"
-      - ".github/**"
+      # ".github/**" is deliberately NOT ignored on this branch: the point of
+      # the branch is to iterate on the FIPS workflows themselves, and ignoring
+      # them means a workflow-only change silently never runs.
   push:
     branches:
       - main
       - release/**
+      # Probe branch: every push re-runs the FIPS baseline.
+      - fips140-build-ci
   workflow_dispatch:
 
 permissions:
@@ -48,8 +52,23 @@ jobs:
       - id: checkout-ref-output
         run: echo "checkout-ref=${{ env.CHECKOUT_REF }}" >> "$GITHUB_OUTPUT"
 
-  test-go:
-    name: Run Go tests
+  # NOTE: this branch is a FIPS 140-3 baseline probe, not a merge candidate.
+  # The regular `test-go` and `test-go-race` jobs are deliberately absent so
+  # that a run reports only what does and does not work under the validated
+  # module. Restore them from `main` before turning this into a real PR.
+
+  build-fips:
+    name: Build everything against the FIPS module
+    needs:
+      - setup
+    uses: ./.github/workflows/test-fips.yml
+    permissions:
+      contents: read
+    with:
+      checkout-ref: ${{ needs.setup.outputs.checkout-ref }}
+
+  test-go-fips-on:
+    name: Run Go tests in FIPS mode
     needs:
       - setup
     uses: ./.github/workflows/test-go.yml
@@ -57,42 +76,47 @@ jobs:
       contents: read
       actions: write
     with:
-      # The regular Go tests use an extra runner to execute the
-      # binary-dependent tests. We isolate them there so that the
-      # other tests aren't slowed down waiting for a binary build.
+      # Mirrors the regular `test-go` job, including the extra runner for the
+      # binary-dependent tests, so the baseline is comparable to a normal run.
       binary-tests: true
       total-runners: 16
       go-arch: amd64
       go-tags: "${{ needs.setup.outputs.go-tags }},deadlock"
       runs-on: ubuntu-latest
+      name: "fips-on"
+      # What a release binary does once an operator sets GODEBUG=fips140=on:
+      # approved algorithms go through the module, unapproved ones still work.
+      env-vars: '{"GOFIPS140":"v1.0.0","GODEBUG":"fips140=on"}'
       checkout-ref: ${{ needs.setup.outputs.checkout-ref }}
     secrets: inherit
 
-  test-go-race:
-    name: Run Go tests with data race detection
+  test-go-fips-only:
+    name: Run Go tests in FIPS-only mode
     needs:
       - setup
-    # Don't run this job for docs/ui only PRs
-    if: |
-      github.event.pull_request.draft == false
     uses: ./.github/workflows/test-go.yml
     permissions:
       contents: read
       actions: write
     with:
       total-runners: 16
-      extra-flags: "-race"
       go-arch: amd64
-      go-tags: ${{ needs.setup.outputs.go-tags }}
+      go-tags: "${{ needs.setup.outputs.go-tags }},deadlock"
       runs-on: ubuntu-latest
-      name: "race"
+      name: "fips-only"
+      # The compliance target: unapproved primitives panic or error instead of
+      # silently passing through. Expected to be widely red today.
+      env-vars: '{"GOFIPS140":"v1.0.0","GODEBUG":"fips140=only"}'
       checkout-ref: ${{ needs.setup.outputs.checkout-ref }}
     secrets: inherit
 
+  # Only the build is gated. The two test jobs are the baseline itself -- they
+  # are expected to report failures, and gating on them would just make every
+  # run red without saying anything useful.
   tests-completed:
     needs:
       - setup
-      - test-go
+      - build-fips
     if: always()
     runs-on: ubuntu-slim
     steps:
