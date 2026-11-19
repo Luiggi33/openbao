@@ -205,13 +205,26 @@ jobs:
 
       - name: Generate SBOMs
         run: |
-          for f in *; do
-            syft "$f" --output "spdx-json=${f}.sbom.json" --enrich all
+          mkdir -p sboms
+          syft file:ui/pnpm-lock.yaml --source-name openbao-ui --source-version "$VERSION" \
+            --output "spdx-json=sboms/ui.sbom.json" --enrich all
+          for f in dist/*; do
+            syft "dist/$f" --output "spdx-json=sboms/${f}.sbom.json" --enrich all
           done
-        working-directory: dist
         env:
           SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES: "true"
           SYFT_GOLANG_SEARCH_REMOTE_LICENSES: "true"
+          SYFT_JAVASCRIPT_SEARCH_REMOTE_LICENSES: "true"
+
+      - name: Merge SBOMs
+        uses: philips-software/SPDXMerge@4d72f17f1ac00a44707bfa1da2905e085739b6d0 # v0.2.0
+        with:
+          docpath: sboms
+          outpath: dist
+          name: OpenBao
+          version: ${{ env.VERSION }}
+          mergetype: 1
+          # docnamespace: https://openbao.org/spdx
 
       - name: Sign artifacts
         run: ./scripts/release/sign.sh
